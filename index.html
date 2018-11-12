@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        var xhr = new XMLHttpRequest();
+        xhr.open('get','https://work1999.kcg.gov.tw/open1999/ServiceRequestsQuery.asmx/ServiceRequestsQuery',true);
+        xhr.send();
+        xhr.onload = function(){
+            //把資料丟進data中
+            var data = JSON.parse(xhr.responseText);
+            
+            //選取下拉選單
+            var sel_zip = document.querySelector('.sel_zip');
+            var sel_infor = document.querySelector('.sel_infor');
+            var area =document.querySelector('.area');
+            var type = document.querySelector('.type');
+            var total = document.querySelector('.total');
+            var list = document.querySelector('.list');
+            var search = document.querySelector('.search');
+            var show = document.querySelector('.show');
+
+            //把所有資料加進下拉選單
+            var option_zip = "";
+            var option_infor = "";
+            var all_zip = {};
+            var all_infor = {};
+
+            for(var i=0;i<data.length;i++){
+                var content1 = data[i].ZipName_;
+                var content2 = data[i].InformDesc_;
+                if(all_zip[content1] == undefined){
+                    option_zip += "<option value='"+content1+"'>"+content1+"</option>";
+                    all_zip[content1] = 1;
+                }
+                if(all_infor[content2] == undefined){
+                    option_infor += "<option value='"+content2+"'>"+content2+"</option>";
+                    all_infor[content2] = 1;
+                }
+            }
+            sel_zip.innerHTML = "<option value='non_zip'>請選擇類型</option>"+option_zip;
+            sel_infor.innerHTML = "<option value='non_infor'>請選擇類型</option>"+option_infor;
+            
+            
+            
+            //列出總共項目
+            search.addEventListener('click',function(e){
+                var sel_zip_ = sel_zip.value;
+                var sel_infor_ = sel_infor.value;
+                var str = "";
+                var int = 0;
+               
+                if(sel_zip_ == 'non_zip' || sel_infor_ == 'non_infor'){
+                  show.textContent = "請選擇地區與派工類型";
+                }else{
+                  for(var j=0;j<data.length;j++){
+                    if(data[j].ZipName_ == sel_zip_ && data[j].InformDesc_ == sel_infor_){
+                        str += "<li><h4>地點："+data[j].address_+"</h4><h5>"+data[j].BeforeDesc_+"</h5></li>";
+                        int += 1;
+                    }
+                  }
+                  area.textContent = sel_zip_;
+                  type.textContent = sel_infor_;
+                  list.innerHTML = str;
+                  total.textContent = "有"+int+"處";
+                }               
+            })               
+        }
+    </script>
+</head>
+<body>
+    <select class='sel_zip' value="123"></select>
+    <select class='sel_infor'></select>
+    
+    <input type="button" value="搜尋" class="search">
+    <h3 class="show" value="start">
+         <span class="area"></span>
+         <span class="type"></span> 
+         <span class="total"></span>
+     </h3>
+
+     <ul class="list"></ul>
+    
+</body>
+</html>
